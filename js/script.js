@@ -1,6 +1,14 @@
 (function (global){
     'use strict';
 
+    function randomInt(min, max) { //функция, генерирующая счучайное число в заданом 
+        if (arguments.length < 2) {
+            max = min;
+            min = 0;
+        }
+        return Math.floor(Math.random() * (max - min )) + min;
+    }
+
     //пример создания события, его наблюдателя
 
     function EventEmmitter() {
@@ -69,9 +77,9 @@
         
     //конец примера
 
-    function Ship(type, health, coordinates, orientation) {
+    function Ship(type, coordinates, orientation) {
         this.type = type;
-        this.health = health;
+        this.health = type;
         this.coordinates = coordinates;
         this.orientation = orientation;
     }
@@ -90,9 +98,7 @@
         this.name = name;        
     }
 
-    Player.prototype.createShips = function (){//создание кораблей
-
-    };
+   
 
     Player.prototype.attackEnemy = function (){//атака чужого корабля
 
@@ -102,6 +108,21 @@
 
     };
 
+    function Field(width, height) {
+        this.width = width;
+        this.height = height;
+        this.createField();
+    }
+
+    Field.prototype.createField = function () {
+        this.map = [];
+        for (var i = 0; i < this.width; i++) {
+            map[i] = [];
+            for (var j=0; j < this.height; j++) {
+                map[i][j] = 0;
+            }
+        }
+    };
 
     function Game(shots) {
         this.shots = shots;
@@ -116,4 +137,43 @@
     Game.prototype.end = function () {//закончить игру
         
     };
+
+    var fleet = [1, 2, 3, 4]; //количество краблей различного типа
+    
+    Game.prototype.createShips = function (width, height, array){//создание кораблей
+        var shipLength = array.length;
+        var ships = [];
+        for (var i = 0 ; i < array.length ; i++) {            
+            for (var j = 0; j < array[i]; j++ ){
+                //console.log(i, j);  
+                var coordinate =  [randomInt(width), randomInt(height)];
+                Field.validateCoord(coordinate[0], coordinate[1]);
+                var orientation = randomInt(4); //0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
+
+                ships.push(new Ship(shipLength, coordinate, orientation));                
+            }
+            shipLength--;            
+        }
+        console.log(ships);
+    };
+
+    Field.prototype.validateCoord = function (x, y) {
+       if (this.map[x][y] === 0 && 
+       this.map[x][y+1] && 
+       this.map[x+1][y] && 
+       this.map[x][y-1] && 
+       this.map[x-1][y] && 
+       this.map[x+1][y+1] && 
+       this.map[x+1][y-1] && 
+       this.map[x-1][y-1] && 
+       this.map[x-1][y+1]) {
+           return true;
+       } 
+       return false;               
+    };
+
+    var field1 = new Field(10, 10);   
+    console.log( field1.createField());
+    var game1 = new Game(50);
+    game1.createShips(10, 10, fleet);
 }(window));
