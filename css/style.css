@@ -1,0 +1,13 @@
+.field div[class^="col"] {
+    width: 30px;
+    height: 30px;
+    border: 1px solid darkblue;
+    background-color: lightskyblue;
+    margin: 0;
+    padding: 0;    
+    display: inline-block;
+}
+
+.field {
+    text-align: center;
+}

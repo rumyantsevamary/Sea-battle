@@ -92,7 +92,6 @@
         
     };
 
-
     function Player(name) {
         this.ships = [];
         this.name = name;        
@@ -117,11 +116,11 @@
     Field.prototype.createField = function () {
         this.map = [];
         for (var i = 0; i < this.width; i++) {
-            map[i] = [];
+            this.map[i] = [];
             for (var j=0; j < this.height; j++) {
-                map[i][j] = 0;
+                this.map[i][j] = 0;
             }
-        }
+        }        
     };
 
     function Game(shots) {
@@ -140,40 +139,267 @@
 
     var fleet = [1, 2, 3, 4]; //количество краблей различного типа
     
-    Game.prototype.createShips = function (width, height, array){//создание кораблей
+    Game.prototype.createShips = function (field, array){//создание кораблей
         var shipLength = array.length;
         var ships = [];
         for (var i = 0 ; i < array.length ; i++) {            
             for (var j = 0; j < array[i]; j++ ){
-                //console.log(i, j);  
-                var coordinate =  [randomInt(width), randomInt(height)];
-                Field.validateCoord(coordinate[0], coordinate[1]);
-                var orientation = randomInt(4); //0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
-
-                ships.push(new Ship(shipLength, coordinate, orientation));                
+                //console.log(i, j); 
+                var rcoord;                
+                do {
+                    rcoord = [randomInt(field.width), randomInt(field.height)];
+                } while (field.validateCoord(rcoord[0], rcoord[1]) === false)
+                //var coordinate =  [randomInt(field.width), randomInt(field.height)];
+                //console.log(field.validateCoord(coordinate[0], coordinate[1]));
+                var coordinate = rcoord;
+                var rorient;
+                do {
+                    rorient = randomInt(4);  
+                } while (field.validateOrientation(coordinate[0], coordinate[1], rorient, shipLength) === false)
+                //var orientation = randomInt(4); //0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
+                var orientation = rorient;
+                ships.push(new Ship(shipLength, coordinate, orientation));
+                field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
             }
             shipLength--;            
         }
         console.log(ships);
+        console.log(field.map);
     };
 
     Field.prototype.validateCoord = function (x, y) {
-       if (this.map[x][y] === 0 && 
-       this.map[x][y+1] && 
-       this.map[x+1][y] && 
-       this.map[x][y-1] && 
-       this.map[x-1][y] && 
-       this.map[x+1][y+1] && 
-       this.map[x+1][y-1] && 
-       this.map[x-1][y-1] && 
-       this.map[x-1][y+1]) {
+       if ((x === 0 && y > 0 && y < 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y+1] === 0 &&
+       this.map[x][y-1] === 0 &&
+       this.map[x+1][y] === 0 &&
+       this.map[x+1][y+1] === 0 && 
+       this.map[x+1][y-1] === 0) ||
+       (x === 9 && y > 0 && y < 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y+1] === 0 &&
+       this.map[x][y-1] === 0 &&
+       this.map[x-1][y] === 0 && 
+       this.map[x-1][y-1] === 0 && 
+       this.map[x-1][y+1] === 0) ||
+       (y === 0 && x > 0 && x < 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x+1][y] === 0 &&
+       this.map[x-1][y] === 0 &&
+       this.map[x][y+1] === 0 &&
+       this.map[x+1][y+1] === 0 &&
+       this.map[x-1][y+1] === 0) ||
+       (y === 9 && x > 0 && x < 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x+1][y] === 0 && 
+       this.map[x][y-1] === 0 && 
+       this.map[x-1][y] === 0 &&
+       this.map[x+1][y-1] === 0 && 
+       this.map[x-1][y-1] === 0) ||
+       (x === 0 && y === 0 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y+1] === 0 &&
+       this.map[x+1][y] === 0 &&
+       this.map[x+1][y+1] === 0) ||
+       (x === 0 && y === 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y-1] === 0 &&
+       this.map[x+1][y] === 0 &&
+       this.map[x+1][y-1] === 0) ||
+       (x === 9 && y === 9 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y-1] === 0 &&
+       this.map[x-1][y-1] === 0 &&
+       this.map[x-1][y] === 0) ||
+       (x === 9 && y === 0 &&
+       this.map[x][y] === 0 &&
+       this.map[x][y+1] === 0 &&
+       this.map[x-1][y+1] === 0 &&
+       this.map[x-1][y] === 0) ||
+       (this.map[x][y] === 0 && 
+       this.map[x][y+1] === 0 && 
+       this.map[x+1][y] === 0 && 
+       this.map[x][y-1] === 0 && 
+       this.map[x-1][y] === 0 && 
+       this.map[x+1][y+1] === 0 && 
+       this.map[x+1][y-1] === 0 && 
+       this.map[x-1][y-1] === 0 && 
+       this.map[x-1][y+1] === 0)) {
            return true;
        } 
        return false;               
     };
 
+    Field.prototype.validateOrientation = function (x, y, orientation, length) {
+        if (orientation === 0) {//up
+            var k = 1;
+            if (y === this.height - length) {
+                for (var i = 1; i < length-1; i++) {
+                    if ((this.map[x][y+i+1] === 0 &&
+                        this.map[x+1][y+i+1] === 0 &&
+                        this.map[x-1][y+i+1] === 0) ||
+                        (x === 0 &&
+                        this.map[x][y+i+1] === 0 &&
+                        this.map[x+1][y+i+1] === 0) ||
+                        (x === 9 &&
+                        this.map[x][y+i+1] === 0 &&
+                        this.map[x-1][y+i+1] === 0)) {
+                            k += 1;
+                        };            
+                };
+            } else {
+                for (var i = 1; i < length; i++) {
+                    if ((this.map[x][y+i+1] === 0 &&
+                        this.map[x+1][y+i+1] === 0 &&
+                        this.map[x-1][y+i+1] === 0) ||
+                        (x === 0 &&
+                        this.map[x][y+i+1] === 0 &&
+                        this.map[x+1][y+i+1] === 0) ||
+                        (x === 9 &&
+                        this.map[x][y+i+1] === 0 &&
+                        this.map[x-1][y+i+1] === 0)) {
+                            k += 1;
+                        };            
+                };
+            };
+            if (k === length) {
+                return true;
+            }
+            return false;
+        } else if (orientation === 1) {//right
+            var k = 1;
+            if (x === this.width - length) {
+                for (var i = 1; i < length-1; i++) {
+                        if ((this.map[x+i+1][y] === 0 &&
+                            this.map[x+1+i][y+1] === 0 &&
+                            this.map[x+1+i][y-1] === 0) ||
+                            (y === 0 &&
+                            this.map[x+i+1][y] === 0 &&
+                            this.map[x+i+1][y+1] === 0) ||
+                            (y === 9 &&
+                            this.map[x+i+1][y] === 0 &&
+                            this.map[x+i+1][y-1] === 0)) {
+                                k += 1;
+                            };            
+                    };
+            } else {
+                for (var i = 1; i < length; i++) {
+                        if ((this.map[x+i+1][y] === 0 &&
+                            this.map[x+1+i][y+1] === 0 &&
+                            this.map[x+1+i][y-1] === 0) ||
+                            (y === 0 &&
+                            this.map[x+i+1][y] === 0 &&
+                            this.map[x+i+1][y+1] === 0) ||
+                            (y === 9 &&
+                            this.map[x+i+1][y] === 0 &&
+                            this.map[x+i+1][y-1] === 0)) {
+                                k += 1;
+                            };            
+                    };
+            };
+            if (k === length) {
+                return true;
+            }
+            return false;                
+        } else if (orientation === 2) {//down
+            var k = 1;
+            if (y === length - 1) {
+                for (var i = 1; i < length-1; i++) {
+                    if ((this.map[x][y-i-1] === 0 &&
+                        this.map[x+1][y-i-1] === 0 &&
+                        this.map[x-1][y-i-1] === 0) ||
+                        (x === 0 &&
+                        this.map[x][y-i-1] === 0 &&
+                        this.map[x+1][y-i-1] === 0) ||
+                        (x === 9 &&
+                        this.map[x][y-i-1] === 0 &&
+                        this.map[x-1][y-i-1] === 0)) {
+                            k += 1;
+                        };            
+                };
+            } else {
+                for (var i = 1; i < length; i++) {
+                    if ((this.map[x][y-i-1] === 0 &&
+                        this.map[x+1][y-i-1] === 0 &&
+                        this.map[x-1][y-i-1] === 0) ||
+                        (x === 0 &&
+                        this.map[x][y-i-1] === 0 &&
+                        this.map[x+1][y-i-1] === 0) ||
+                        (x === 9 &&
+                        this.map[x][y-i-1] === 0 &&
+                        this.map[x-1][y-i-1] === 0)) {
+                            k += 1;
+                        };            
+                };
+            };
+            if (k === length) {
+                return true;
+            }
+            return false;
+        } else if (orientation === 3) {//left
+            var k = 1;
+            if (x === length - 1) {
+                for (var i = 1; i < length-1; i++) {
+                        if ((this.map[x-i-1][y] === 0 &&
+                            this.map[x-1-i][y+1] === 0 &&
+                            this.map[x-1-i][y-1] === 0) ||
+                            (y === 0 &&
+                            this.map[x-i-1][y] === 0 &&
+                            this.map[x-i-1][y+1] === 0) ||
+                            (y === 9 &&
+                            this.map[x-i-1][y] === 0 &&
+                            this.map[x-i-1][y-1] === 0)) {
+                                k += 1;
+                            };            
+                    };
+            } else {
+                for (var i = 1; i < length; i++) {
+                        if ((this.map[x-i-1][y] === 0 &&
+                            this.map[x-1-i][y+1] === 0 &&
+                            this.map[x-1-i][y-1] === 0) ||
+                            (y === 0 &&
+                            this.map[x-i-1][y] === 0 &&
+                            this.map[x-i-1][y+1] === 0) ||
+                            (y === 9 &&
+                            this.map[x-i-1][y] === 0 &&
+                            this.map[x-i-1][y-1] === 0)) {
+                                k += 1;
+                            };            
+                    };
+            };
+            if (k === length) {
+                return true;
+            }
+            return false;
+        }
+    };
+
+    Field.prototype.fillMap = function (x, y, length, orientation) {
+        if (orientation === 0) {
+                for (var j = y; j < y + length; j++) {//up
+                    var i = x;
+                    this.map[i][j] = 1;
+                };
+        }  else if (orientation === 1)  {//right
+                for (var i = x; i < x + length; i++) {//right
+                    var j = y;
+                    this.map[i][j] = 1;
+                };
+        }  else if (orientation === 2)  {//down
+                for (var j = y; j > y - length; j--) {//down
+                    var i = x;
+                    this.map[i][j] = 1;
+                };
+        } else {
+                for (var i = x; i > x - length; i--) {//left
+                    var j = y;
+                    this.map[i][j] = 1;
+               };
+        };
+    };
+
     var field1 = new Field(10, 10);   
-    console.log( field1.createField());
+    field1.createField();
     var game1 = new Game(50);
-    game1.createShips(10, 10, fleet);
+    game1.createShips(field1, fleet);
 }(window));
