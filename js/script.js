@@ -144,20 +144,20 @@
         var ships = [];
         for (var i = 0 ; i < array.length ; i++) {            
             for (var j = 0; j < array[i]; j++ ){
-                //console.log(i, j); 
                 var rcoord;                
                 do {
                     rcoord = [randomInt(field.width), randomInt(field.height)];
                 } while (field.validateCoord(rcoord[0], rcoord[1]) === false)
-                //var coordinate =  [randomInt(field.width), randomInt(field.height)];
-                //console.log(field.validateCoord(coordinate[0], coordinate[1]));
+
                 var coordinate = rcoord;
+
                 var rorient;
                 do {
-                    rorient = randomInt(4);  
+                    rorient = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
                 } while (field.validateOrientation(coordinate[0], coordinate[1], rorient, shipLength) === false)
-                //var orientation = randomInt(4); //0 - вверх, 1 - вправо, 2 - вниз, 3 - влево
+
                 var orientation = rorient;
+
                 ships.push(new Ship(shipLength, coordinate, orientation));
                 field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
             }
@@ -168,66 +168,83 @@
     };
 
     Field.prototype.validateCoord = function (x, y) {
-       if ((x === 0 && y > 0 && y < 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y+1] === 0 &&
-       this.map[x][y-1] === 0 &&
-       this.map[x+1][y] === 0 &&
-       this.map[x+1][y+1] === 0 && 
-       this.map[x+1][y-1] === 0) ||
-       (x === 9 && y > 0 && y < 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y+1] === 0 &&
-       this.map[x][y-1] === 0 &&
-       this.map[x-1][y] === 0 && 
-       this.map[x-1][y-1] === 0 && 
-       this.map[x-1][y+1] === 0) ||
-       (y === 0 && x > 0 && x < 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x+1][y] === 0 &&
-       this.map[x-1][y] === 0 &&
-       this.map[x][y+1] === 0 &&
-       this.map[x+1][y+1] === 0 &&
-       this.map[x-1][y+1] === 0) ||
-       (y === 9 && x > 0 && x < 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x+1][y] === 0 && 
-       this.map[x][y-1] === 0 && 
-       this.map[x-1][y] === 0 &&
-       this.map[x+1][y-1] === 0 && 
-       this.map[x-1][y-1] === 0) ||
-       (x === 0 && y === 0 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y+1] === 0 &&
-       this.map[x+1][y] === 0 &&
-       this.map[x+1][y+1] === 0) ||
-       (x === 0 && y === 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y-1] === 0 &&
-       this.map[x+1][y] === 0 &&
-       this.map[x+1][y-1] === 0) ||
-       (x === 9 && y === 9 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y-1] === 0 &&
-       this.map[x-1][y-1] === 0 &&
-       this.map[x-1][y] === 0) ||
-       (x === 9 && y === 0 &&
-       this.map[x][y] === 0 &&
-       this.map[x][y+1] === 0 &&
-       this.map[x-1][y+1] === 0 &&
-       this.map[x-1][y] === 0) ||
-       (this.map[x][y] === 0 && 
-       this.map[x][y+1] === 0 && 
-       this.map[x+1][y] === 0 && 
-       this.map[x][y-1] === 0 && 
-       this.map[x-1][y] === 0 && 
-       this.map[x+1][y+1] === 0 && 
-       this.map[x+1][y-1] === 0 && 
-       this.map[x-1][y-1] === 0 && 
-       this.map[x-1][y+1] === 0)) {
-           return true;
-       } 
-       return false;               
+       if (x === 0 && y > 0 && y < 9) {
+           if (this.map[x][y] === 0 &&
+               this.map[x][y+1] === 0 &&
+               this.map[x][y-1] === 0 &&
+               this.map[x+1][y] === 0 &&
+               this.map[x+1][y+1] === 0 && 
+               this.map[x+1][y-1] === 0) {
+                   return true;
+               } return false;
+       } else if (x === 9 && y > 0 && y < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x-1][y] === 0 && 
+            this.map[x-1][y-1] === 0 && 
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (y === 0 && x > 0 && x < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x-1][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x+1][y+1] === 0 &&
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (y === 9 && x > 0 && x < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x+1][y] === 0 && 
+            this.map[x][y-1] === 0 && 
+            this.map[x-1][y] === 0 &&
+            this.map[x+1][y-1] === 0 && 
+            this.map[x-1][y-1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 0 && y === 0) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x+1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 0 && y === 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x+1][y-1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 9 && y === 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x-1][y-1] === 0 &&
+            this.map[x-1][y] === 0) {
+                return true;
+            } return false;
+       } else if (x === 9 && y === 0) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x-1][y+1] === 0 &&
+            this.map[x-1][y] === 0) {
+                return true;
+            } return false;
+       } else {
+           if (this.map[x][y] === 0 && 
+            this.map[x][y+1] === 0 && 
+            this.map[x+1][y] === 0 && 
+            this.map[x][y-1] === 0 && 
+            this.map[x-1][y] === 0 && 
+            this.map[x+1][y+1] === 0 && 
+            this.map[x+1][y-1] === 0 && 
+            this.map[x-1][y-1] === 0 && 
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false; 
+       }              
     };
 
     Field.prototype.validateOrientation = function (x, y, orientation, length) {
@@ -235,31 +252,43 @@
             var k = 1;
             if (y === this.height - length) {
                 for (var i = 1; i < length-1; i++) {
-                    if ((this.map[x][y+i+1] === 0 &&
-                        this.map[x+1][y+i+1] === 0 &&
-                        this.map[x-1][y+i+1] === 0) ||
-                        (x === 0 &&
-                        this.map[x][y+i+1] === 0 &&
-                        this.map[x+1][y+i+1] === 0) ||
-                        (x === 9 &&
-                        this.map[x][y+i+1] === 0 &&
-                        this.map[x-1][y+i+1] === 0)) {
-                            k += 1;
-                        };            
+                    if (x === 0) {
+                        if (this.map[x][y+i+1] === 0 &&
+                            this.map[x+1][y+i+1] === 0) {
+                                k += 1;
+                            }
+                    } else if (x === 9) {
+                        if ( this.map[x][y+i+1] === 0 &&
+                            this.map[x-1][y+i+1] === 0) {
+                                k += 1;  
+                            }
+                    } else {
+                        if (this.map[x][y+i+1] === 0 &&
+                            this.map[x+1][y+i+1] === 0 &&
+                            this.map[x-1][y+i+1] === 0) {
+                                k += 1;
+                            }
+                    }
                 };
             } else {
                 for (var i = 1; i < length; i++) {
-                    if ((this.map[x][y+i+1] === 0 &&
-                        this.map[x+1][y+i+1] === 0 &&
-                        this.map[x-1][y+i+1] === 0) ||
-                        (x === 0 &&
-                        this.map[x][y+i+1] === 0 &&
-                        this.map[x+1][y+i+1] === 0) ||
-                        (x === 9 &&
-                        this.map[x][y+i+1] === 0 &&
-                        this.map[x-1][y+i+1] === 0)) {
-                            k += 1;
-                        };            
+                    if (x === 0) {
+                        if ( this.map[x][y+i+1] === 0 &&
+                            this.map[x+1][y+i+1] === 0) {
+                                k += 1;
+                            }
+                    } else if (x === 9) {
+                        if (this.map[x][y+i+1] === 0 &&
+                            this.map[x-1][y+i+1] === 0) {
+                                k += 1;
+                        }
+                    } else {
+                        if (this.map[x][y+i+1] === 0 &&
+                            this.map[x+1][y+i+1] === 0 &&
+                            this.map[x-1][y+i+1] === 0) {
+                                k += 1;
+                            }
+                    }        
                 };
             };
             if (k === length) {
@@ -270,31 +299,43 @@
             var k = 1;
             if (x === this.width - length) {
                 for (var i = 1; i < length-1; i++) {
-                        if ((this.map[x+i+1][y] === 0 &&
-                            this.map[x+1+i][y+1] === 0 &&
-                            this.map[x+1+i][y-1] === 0) ||
-                            (y === 0 &&
-                            this.map[x+i+1][y] === 0 &&
-                            this.map[x+i+1][y+1] === 0) ||
-                            (y === 9 &&
-                            this.map[x+i+1][y] === 0 &&
-                            this.map[x+i+1][y-1] === 0)) {
-                                k += 1;
-                            };            
+                        if (y === 0) {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+i+1][y+1] === 0) {
+                                     k += 1;
+                                }
+                        } else if (y === 9) {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+i+1][y-1] === 0) {
+                                    k += 1;
+                                }
+                        } else {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+1+i][y+1] === 0 &&
+                                this.map[x+1+i][y-1] === 0) {
+                                    k += 1;
+                                }
+                        }           
                     };
             } else {
                 for (var i = 1; i < length; i++) {
-                        if ((this.map[x+i+1][y] === 0 &&
-                            this.map[x+1+i][y+1] === 0 &&
-                            this.map[x+1+i][y-1] === 0) ||
-                            (y === 0 &&
-                            this.map[x+i+1][y] === 0 &&
-                            this.map[x+i+1][y+1] === 0) ||
-                            (y === 9 &&
-                            this.map[x+i+1][y] === 0 &&
-                            this.map[x+i+1][y-1] === 0)) {
-                                k += 1;
-                            };            
+                        if (y === 0) {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+i+1][y+1] === 0) {
+                                     k += 1;
+                                }
+                        } else if (y === 9) {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+i+1][y-1] === 0) {
+                                    k += 1;
+                                }
+                        } else {
+                            if (this.map[x+i+1][y] === 0 &&
+                                this.map[x+1+i][y+1] === 0 &&
+                                this.map[x+1+i][y-1] === 0) {
+                                    k += 1;
+                                }
+                        }           
                     };
             };
             if (k === length) {
@@ -305,31 +346,43 @@
             var k = 1;
             if (y === length - 1) {
                 for (var i = 1; i < length-1; i++) {
-                    if ((this.map[x][y-i-1] === 0 &&
-                        this.map[x+1][y-i-1] === 0 &&
-                        this.map[x-1][y-i-1] === 0) ||
-                        (x === 0 &&
-                        this.map[x][y-i-1] === 0 &&
-                        this.map[x+1][y-i-1] === 0) ||
-                        (x === 9 &&
-                        this.map[x][y-i-1] === 0 &&
-                        this.map[x-1][y-i-1] === 0)) {
-                            k += 1;
-                        };            
+                    if (x === 0) {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x+1][y-i-1] === 0) {
+                                k += 1;
+                            }
+                    } else if (x === 9) {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x-1][y-i-1] === 0) {
+                               k += 1; 
+                            }
+                    } else {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x+1][y-i-1] === 0 &&
+                            this.map[x-1][y-i-1] === 0) {
+                                k += 1;
+                            }
+                    }   
                 };
             } else {
                 for (var i = 1; i < length; i++) {
-                    if ((this.map[x][y-i-1] === 0 &&
-                        this.map[x+1][y-i-1] === 0 &&
-                        this.map[x-1][y-i-1] === 0) ||
-                        (x === 0 &&
-                        this.map[x][y-i-1] === 0 &&
-                        this.map[x+1][y-i-1] === 0) ||
-                        (x === 9 &&
-                        this.map[x][y-i-1] === 0 &&
-                        this.map[x-1][y-i-1] === 0)) {
-                            k += 1;
-                        };            
+                    if (x === 0) {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x+1][y-i-1] === 0) {
+                                k += 1;
+                            }
+                    } else if (x === 9) {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x-1][y-i-1] === 0) {
+                               k += 1; 
+                            }
+                    } else {
+                        if (this.map[x][y-i-1] === 0 &&
+                            this.map[x+1][y-i-1] === 0 &&
+                            this.map[x-1][y-i-1] === 0) {
+                                k += 1;
+                            }
+                    }            
                 };
             };
             if (k === length) {
@@ -340,31 +393,43 @@
             var k = 1;
             if (x === length - 1) {
                 for (var i = 1; i < length-1; i++) {
-                        if ((this.map[x-i-1][y] === 0 &&
-                            this.map[x-1-i][y+1] === 0 &&
-                            this.map[x-1-i][y-1] === 0) ||
-                            (y === 0 &&
-                            this.map[x-i-1][y] === 0 &&
-                            this.map[x-i-1][y+1] === 0) ||
-                            (y === 9 &&
-                            this.map[x-i-1][y] === 0 &&
-                            this.map[x-i-1][y-1] === 0)) {
-                                k += 1;
-                            };            
+                        if (y === 0) {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-i-1][y+1] === 0) {
+                                    k += 1;
+                                }
+                        } else if (y === 9) {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-i-1][y-1] === 0) {
+                                    k += 1;
+                                }
+                        } else {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-1-i][y+1] === 0 &&
+                                this.map[x-1-i][y-1] === 0) {
+                                    k += 1;
+                                }
+                        }          
                     };
             } else {
                 for (var i = 1; i < length; i++) {
-                        if ((this.map[x-i-1][y] === 0 &&
-                            this.map[x-1-i][y+1] === 0 &&
-                            this.map[x-1-i][y-1] === 0) ||
-                            (y === 0 &&
-                            this.map[x-i-1][y] === 0 &&
-                            this.map[x-i-1][y+1] === 0) ||
-                            (y === 9 &&
-                            this.map[x-i-1][y] === 0 &&
-                            this.map[x-i-1][y-1] === 0)) {
-                                k += 1;
-                            };            
+                        if (y === 0) {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-i-1][y+1] === 0) {
+                                    k += 1;
+                                }
+                        } else if (y === 9) {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-i-1][y-1] === 0) {
+                                    k += 1;
+                                }
+                        } else {
+                            if (this.map[x-i-1][y] === 0 &&
+                                this.map[x-1-i][y+1] === 0 &&
+                                this.map[x-1-i][y-1] === 0) {
+                                    k += 1;
+                                }
+                        }            
                     };
             };
             if (k === length) {
@@ -402,4 +467,18 @@
     field1.createField();
     var game1 = new Game(50);
     game1.createShips(field1, fleet);
+    
+    for (var i = 0; i < field1.width; i++) {
+        for (var j = 0; j < field1.height; j++) {
+            if (field1.map[i][j] === 1) {
+                var x = i + 1;
+                var y = j + 1;
+                var row = "row-" + x;
+                var col = "col-" + y;
+                var selector = "." + row + " " + "." + col;
+                var elem = document.querySelector(selector);
+                elem.classList.add("ship");
+            }
+        }
+    };
 }(window));

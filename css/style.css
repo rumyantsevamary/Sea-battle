@@ -11,3 +11,7 @@
 .field {
     text-align: center;
 }
+
+.field div.ship {
+    background-color: darkslateblue; 
+}
