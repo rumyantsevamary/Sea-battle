@@ -188,3 +188,34 @@ Field.prototype.fillMap = function (x, y, length, orientation) {
             }
         }
     };
+
+    Game.prototype.destroyShip = function(ships) {
+        for (var i = 0; i < ships.length; i++) {
+            if (ships[i].health === 0) {
+                var x = ships[i].coordinate[0] + 1;
+                var y = ships[i].coordinate[1] + 1;
+                var orient = ships[i].orientation;
+                var shipLength = ships[i].type;
+                if (orient === 0) 
+                    for (var j = 0; j < shipLength + 2; j++) {
+                        var x1 = x - 1,
+                            y1 = y - 1,
+                            x2 = x + 1,
+                            y2 = y - 1,
+                            selector1 = "." + "row-" + x1 + " " + "." + "col-" + y1,
+                            selector2 = "." + "row-" + x2 + " " + "." + "col-" + y2,
+                            elem1 = document.querySelector(selector1),
+                            elem2 = document.querySelector(selector2);
+                            elem1.classList.add("attackedNone");
+                            elem2.classList.add("attackedNone");
+                    }
+                } else if (orient === 1) {
+
+                } else if (orient === 2) {
+
+                } else {
+
+                }
+
+            }
+    };

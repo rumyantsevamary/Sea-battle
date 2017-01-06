@@ -77,11 +77,12 @@
         
     //конец примера
 
-    function Ship(type, coordinates, orientation) {
+    function Ship(type, coordinate, orientation, body) {
         this.type = type;
         this.health = type;
-        this.coordinates = coordinates;
+        this.coordinate = coordinate;
         this.orientation = orientation;
+        this.body = body;
     }
 
     Ship.prototype.checkStatus = function () { //проверка здоровья
@@ -137,6 +138,37 @@
         field1.addReaction();
     };
 
+    Game.prototype.destroyShip = function(ships) {
+        for (var i = 0; i < ships.length; i++) {
+            if (ships[i].health === 0) {
+                var x = ships[i].coordinate[0] + 1;
+                var y = ships[i].coordinate[1] + 1;
+                var orient = ships[i].orientation;
+                var shipLength = ships[i].type;
+                if (orient === 0) 
+                    for (var j = 0; j < shipLength + 2; j++) {
+                        var x1 = x - 1,
+                            y1 = y - 1,
+                            x2 = x + 1,
+                            y2 = y - 1,
+                            selector1 = "." + "row-" + x1 + " " + "." + "col-" + y1,
+                            selector2 = "." + "row-" + x2 + " " + "." + "col-" + y2,
+                            elem1 = document.querySelector(selector1),
+                            elem2 = document.querySelector(selector2);
+                            elem1.classList.add("attackedNone");
+                            elem2.classList.add("attackedNone");
+                    }
+                } else if (orient === 1) {
+
+                } else if (orient === 2) {
+
+                } else {
+
+                }
+
+            }
+    };
+
     Game.prototype.end = function () {//закончить игру
         
     };
@@ -159,16 +191,35 @@
                 do {
                     rorient = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
                 } while (field.validateOrientation(coordinate[0], coordinate[1], rorient, shipLength) === false)
-
                 var orientation = rorient;                
 
-                ships.push(new Ship(shipLength, coordinate, orientation));
+                var body = [];
+                if (orientation === 0) {
+                    for (var k = 0; k < shipLength; k++) {
+                        body[k]=[coordinate[0], coordinate[1] + k];
+                    }
+                } else if (orientation === 1) {
+                    for (var k = 0; k < shipLength; k++) {
+                        body[k]=[coordinate[0] + k, coordinate[1]];
+                    }
+                } else if (orientation === 2) {
+                    for (var k = 0; k < shipLength; k++) {
+                        body[k]=[coordinate[0], coordinate[1] - k];
+                    }
+                } else {
+                    for (var k = 0; k < shipLength; k++) {
+                        body[k]=[coordinate[0] - k, coordinate[1]];
+                    }
+                }
+
+                ships.push(new Ship(shipLength, coordinate, orientation, body));
                 field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
             }
             shipLength--;            
         }
         console.log(ships);
         console.log(field.map);
+        return ships;
     };
 
     Field.prototype.validateCoord = function (x, y) {
@@ -469,7 +520,8 @@
 
     
 
-    Field.prototype.addReaction = function () {
+    Field.prototype.addReaction = function (ships) {  
+        var ships = ships;      
         for (var i = 0; i < this.width; i++){
             for (var j = 0; j < this.height; j++) {
                 var x = i + 1;
@@ -487,11 +539,28 @@
                 function attackShip() {                     
                     var colClass = this.classList[0];
                     var rowClass = this.parentNode.classList[0];
-                    var i = parseInt(rowClass.substr(4)) - 1;
-                    var j = parseInt(colClass.substr(4)) - 1;
-                    //console.log(i, j);  
-                    
-                                  
+                    var j = parseInt(rowClass.substr(4)) - 1;
+                    var i = parseInt(colClass.substr(4)) - 1;  
+                    for (var l = 0; l < ships.length; l++) {
+                        for (var k = 0; k < ships[l].body.length; k++) {
+                            if (ships[l].body[k][0] === j && ships[l].body[k][1] === i) {
+                                ships[l].health -= 1;  
+                                console.log(ships[l]);
+                                if (ships[l].health === 0) {
+                                    var row = ships[l].coordinate[0] + 1;
+                                    var col = ships[l].coordinate[1] + 1;
+                                    var orient = ships[l].orientation;
+                                    var shipLength = ships[l].type;
+                                    console.log(col, row, orient, shipLength);                                
+
+                                }                                 
+                            }
+                        }
+                        
+                        
+                    }
+                                       
+
                     this.classList.add('attackedShip');                   
                 };
 
@@ -505,7 +574,7 @@
     var field1 = new Field(10, 10);   
     field1.createField();
     var game1 = new Game(50);
-    game1.createShips(field1, fleet);
-    field1.addReaction();
+    var ships1 = game1.createShips(field1, fleet);    
+    field1.addReaction(ships1);
     
 }(window));
