@@ -172,3 +172,19 @@ Field.prototype.fillMap = function (x, y, length, orientation) {
             return false;
         }
     };
+
+    Field.prototype.showShips = function (field) {
+        for (var i = 0; i < field.width; i++) {
+            for (var j = 0; j < field1.height; j++) {
+                if (field.map[i][j] === 1) {
+                    var x = i + 1;
+                    var y = j + 1;
+                    var row = "row-" + x;
+                    var col = "col-" + y;
+                    var selector = "." + row + " " + "." + col;
+                    var elem = document.querySelector(selector);
+                    elem.classList.add("ship");
+                }
+            }
+        }
+    };

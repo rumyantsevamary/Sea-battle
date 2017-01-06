@@ -129,8 +129,12 @@
         this.player2 = null;
     }
 
-    Game.prototype.start = function () {//начать игру
-
+    Game.prototype.start = function (width, height, shots) {//начать игру
+        var field1 = new Field(width, height);   
+        field1.createField();
+        var game1 = new Game(shots);
+        game1.createShips(field1, fleet);
+        field1.addReaction();
     };
 
     Game.prototype.end = function () {//закончить игру
@@ -156,7 +160,7 @@
                     rorient = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
                 } while (field.validateOrientation(coordinate[0], coordinate[1], rorient, shipLength) === false)
 
-                var orientation = rorient;
+                var orientation = rorient;                
 
                 ships.push(new Ship(shipLength, coordinate, orientation));
                 field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
@@ -270,7 +274,7 @@
                             }
                     }
                 };
-            } else {
+            } else if (y < this.height - length) {
                 for (var i = 1; i < length; i++) {
                     if (x === 0) {
                         if ( this.map[x][y+i+1] === 0 &&
@@ -317,7 +321,7 @@
                                 }
                         }           
                     };
-            } else {
+            } else if (x < this.width - length) {
                 for (var i = 1; i < length; i++) {
                         if (y === 0) {
                             if (this.map[x+i+1][y] === 0 &&
@@ -364,7 +368,7 @@
                             }
                     }   
                 };
-            } else {
+            } else if (y > length - 1) {
                 for (var i = 1; i < length; i++) {
                     if (x === 0) {
                         if (this.map[x][y-i-1] === 0 &&
@@ -411,7 +415,7 @@
                                 }
                         }          
                     };
-            } else {
+            } else if (x > length - 1) {
                 for (var i = 1; i < length; i++) {
                         if (y === 0) {
                             if (this.map[x-i-1][y] === 0 &&
@@ -463,22 +467,45 @@
         };
     };
 
-    var field1 = new Field(10, 10);   
-    field1.createField();
-    var game1 = new Game(50);
-    game1.createShips(field1, fleet);
     
-    for (var i = 0; i < field1.width; i++) {
-        for (var j = 0; j < field1.height; j++) {
-            if (field1.map[i][j] === 1) {
+
+    Field.prototype.addReaction = function () {
+        for (var i = 0; i < this.width; i++){
+            for (var j = 0; j < this.height; j++) {
                 var x = i + 1;
                 var y = j + 1;
                 var row = "row-" + x;
                 var col = "col-" + y;
                 var selector = "." + row + " " + "." + col;
                 var elem = document.querySelector(selector);
-                elem.classList.add("ship");
+                if (this.map[i][j] === 1) {
+                    elem.addEventListener('click', attackShip);
+                } else {
+                    elem.addEventListener('click', attackNone);
+                } 
+
+                function attackShip() {                     
+                    var colClass = this.classList[0];
+                    var rowClass = this.parentNode.classList[0];
+                    var i = parseInt(rowClass.substr(4)) - 1;
+                    var j = parseInt(colClass.substr(4)) - 1;
+                    //console.log(i, j);  
+                    
+                                  
+                    this.classList.add('attackedShip');                   
+                };
+
+                function attackNone() {
+                    this.classList.add('attackedNone');
+                };
             }
         }
     };
+
+    var field1 = new Field(10, 10);   
+    field1.createField();
+    var game1 = new Game(50);
+    game1.createShips(field1, fleet);
+    field1.addReaction();
+    
 }(window));

@@ -15,3 +15,11 @@
 .field div.ship {
     background-color: darkslateblue; 
 }
+
+.field div.attackedShip {
+    background-color: firebrick;
+}
+
+.field div.attackedNone {
+    background-color: lightblue;
+}
