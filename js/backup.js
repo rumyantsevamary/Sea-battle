@@ -219,3 +219,25 @@ Field.prototype.fillMap = function (x, y, length, orientation) {
 
             }
     };
+
+
+    
+                                        
+                                        
+
+            //orient === 0
+            for (var i = 0; i < 3; i ++){
+                var row = y - 1 + i;
+                if (row === y){
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var col = x - 1 + j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
+            }

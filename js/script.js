@@ -89,8 +89,126 @@
 
     };
 
-    Ship.prototype.attack = function () { //атака корабля
-        
+    Ship.prototype.showAround = function () { //корабль убит, показать клетки вокруг него
+        var y = this.coordinate[0] + 1;
+        var x = this.coordinate[1] + 1;
+        var orient = this.orientation;
+        var shipLength = this.type;
+        console.log(x, y, orient, shipLength);
+        if (orient === 0) {
+            for (var i = 0; i < 3; i ++){
+                var row = y - 1 + i;
+                if (row === y){
+                    var col1 = x - 1;
+                    var col2 = x + shipLength;
+                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
+                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var col = x - 1 + j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
+            }            
+        } else if (orient === 2) {
+            for (var i = 0; i < 3; i ++){
+                var row = y - 1 + i;
+                if (row === y){
+                    var col1 = x + 1;
+                    var col2 = x - shipLength;
+                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
+                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var col = x + 1 - j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
+            }
+        } else if (orient === 3) {
+            for (var i = 0; i < 3; i ++){
+                var col = x - 1 + i;
+                if (col === x){
+                    var row1 = y - 1;
+                    var row2 = y + shipLength;
+                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
+                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var row = y - 1 + j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
+            }
+        } else if (orient === 1) {
+            for (var i = 0; i < 3; i ++){
+                var col = x - 1 + i;
+                if (col === x){
+                    var row1 = y + 1;
+                    var row2 = y - shipLength;
+                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
+                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var row = y + 1 - j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
+            }
+        }
+       
     };
 
     function Player(name) {
@@ -544,24 +662,16 @@
                     for (var l = 0; l < ships.length; l++) {
                         for (var k = 0; k < ships[l].body.length; k++) {
                             if (ships[l].body[k][0] === j && ships[l].body[k][1] === i) {
-                                ships[l].health -= 1;  
-                                console.log(ships[l]);
-                                if (ships[l].health === 0) {
-                                    var row = ships[l].coordinate[0] + 1;
-                                    var col = ships[l].coordinate[1] + 1;
-                                    var orient = ships[l].orientation;
-                                    var shipLength = ships[l].type;
-                                    console.log(col, row, orient, shipLength);                                
-
+                                ships[l].health -= 1;
+                                var ship = ships[l];  
+                                console.log(ship);
+                                if (ship.health === 0) {                                    
+                                     ship.showAround();                                    
                                 }                                 
                             }
-                        }
-                        
-                        
+                        }   
                     }
-                                       
-
-                    this.classList.add('attackedShip');                   
+                   this.classList.add('attackedShip');                   
                 };
 
                 function attackNone() {
