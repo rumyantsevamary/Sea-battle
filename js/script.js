@@ -151,7 +151,7 @@
                     }
                 }
             }
-        } else if (orient === 3) {
+        } else if (orient === 1) {
             for (var i = 0; i < 3; i ++){
                 var col = x - 1 + i;
                 if (col === x){
@@ -179,7 +179,7 @@
                     }
                 }
             }
-        } else if (orient === 1) {
+        } else if (orient === 3) {
             for (var i = 0; i < 3; i ++){
                 var col = x - 1 + i;
                 if (col === x){
