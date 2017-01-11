@@ -8,81 +8,19 @@
         }
         return Math.floor(Math.random() * (max - min )) + min;
     }
-
-    //пример создания события, его наблюдателя
-
-    function EventEmmitter() {
-        this.handlers = {};
-
-        this.on = function (eventName, handler) {
-            if (!(eventName in this.handlers)) {
-                this.handlers[eventName] = [];
-            }
-
-            this.handlers[eventName].push(handler);
-        };
-
-        this.off = function (eventName, handler) {
-            var name,
-                i;
-
-            if (eventName && (eventName in this.handlers)) {
-                if (!handler) {
-                    delete this.handlers[eventName];//удаляем свойство из объекта
-                    return;
-                }
-                i = this.handlers[eventName].indexOf(handler);
-                this.handlers[name].splice(i, 1);//нужна проверка на -1
-                return;
-            }
-
-            for (name in this.handlers) {
-                i = this.handlers[name].indexOf(handler);
-                this.handlers[name].splice(i, 1);//нужна проверка на -1
-            }
-        };
-
-        this.emit = function (eventName) {
-            var handlers,
-                i,
-                len;
-            if (eventName in this.handlers) {
-                handlers = this.handlers[eventName];
-
-                for (i=0, len = handlers.length; i < len; i++) {
-                    handlers[i].apply(this, Array.prototype.slice.call(arguments, 1));//правращаем аргументы в массив
-                }
-            }
-        };
+    
+    function Section(x, y) {
+        this.x = x;
+        this.y = y;
+        this.status = true;
     }
 
-    function Subject() {}
-
-    EventEmmitter.call(Subject.prototype);//примесь
-
-    Subject.prototype.send = function () {
-        this.emit('sended');
-    };
-
-    function Observer() {}
-
-    Observer.prototype.onSend = function () {
-        console.log(arguments);
-    };
-
-    var subject1 = new Subject(),
-        observer1 = new Observer();
-
-    subject1.on('sended', observer1.onSend);   
-        
-    //конец примера
-
-    function Ship(type, coordinate, orientation, body) {
-        this.type = type;
-        this.health = type;
-        this.coordinate = coordinate;
-        this.orientation = orientation;
-        this.body = body;
+    function Ship(sectionNumber, id, section) {
+        this.sectionNumber = sectionNumber;
+        this.health = sectionNumber;
+        this.sections = [];
+        this.id = id;
+    
     }
 
     Ship.prototype.checkStatus = function () { //проверка здоровья
@@ -218,22 +156,15 @@
 
    
 
-    Player.prototype.attackEnemy = function (){//атака чужого корабля
-
-    };
-
-    Player.prototype.attack = function (){//нас атакуют
-
-    };
-
-    function Field(width, height) {
+    function Field(width, height) {// конструктор поля
         this.width = width;
         this.height = height;
-        this.createField();
+        this.map = [];
+        this.generateField();
+        this.createMap();
     }
 
-    Field.prototype.createField = function () {
-        this.map = [];
+    Field.prototype.createMap = function () {//создание карты поля
         for (var i = 0; i < this.width; i++) {
             this.map[i] = [];
             for (var j=0; j < this.height; j++) {
@@ -242,102 +173,88 @@
         }        
     };
 
-    function Game(shots) {
-        this.shots = shots;
-        this.player1 = null;
-        this.player2 = null;
-    }
-
-    Game.prototype.start = function (width, height, shots) {//начать игру
-        var field1 = new Field(width, height);   
-        field1.createField();
-        var game1 = new Game(shots);
-        game1.createShips(field1, fleet);
-        field1.addReaction();
-    };
-
-    Game.prototype.destroyShip = function(ships) {
-        for (var i = 0; i < ships.length; i++) {
-            if (ships[i].health === 0) {
-                var x = ships[i].coordinate[0] + 1;
-                var y = ships[i].coordinate[1] + 1;
-                var orient = ships[i].orientation;
-                var shipLength = ships[i].type;
-                if (orient === 0) 
-                    for (var j = 0; j < shipLength + 2; j++) {
-                        var x1 = x - 1,
-                            y1 = y - 1,
-                            x2 = x + 1,
-                            y2 = y - 1,
-                            selector1 = "." + "row-" + x1 + " " + "." + "col-" + y1,
-                            selector2 = "." + "row-" + x2 + " " + "." + "col-" + y2,
-                            elem1 = document.querySelector(selector1),
-                            elem2 = document.querySelector(selector2);
-                            elem1.classList.add("attackedNone");
-                            elem2.classList.add("attackedNone");
-                    }
-                } else if (orient === 1) {
-
-                } else if (orient === 2) {
-
-                } else {
-
-                }
-
+    Field.prototype.generateField = function() { //визуальное создание поля
+        var elem = document.getElementById('field');
+        for (var i = 1; i <= this.height ; i++) {
+            var newRow = document.createElement('div');
+            var rowClass = 'row-' + i;
+            newRow.classList.add(rowClass);                        
+            for (var j = 1; j <= this.width; j ++) {
+                var newCol = document.createElement('div');
+                var colClass = 'col-'+ j;
+                newCol.classList.add(colClass);
+                newRow.appendChild(newCol);
             }
-    };
-
-    Game.prototype.end = function () {//закончить игру
+            elem.appendChild(newRow);
+        }
         
     };
 
-    var fleet = [1, 2, 3, 4]; //количество краблей различного типа
+    function GameZone(width, height, fleet, shots) {
+        this.shots = shots;
+        this.width = width;
+        this.height = height;
+        this.ships = [];
+        this.player1 = null;
+        this.player2 = null;
+        this.fleet = fleet;//var fleet = [1, 2, 3, 4]; //количество краблей различного типа
+    }
+        
+
+    GameZone.prototype.createShips = function () {//создание флота
+        var shipLength = this.fleet.length;        
+        for (var i = 0 ; i < this.fleet.length ; i++) {            
+            for (var j = 0; j < this.fleet[i]; j++ ){
+                this.ships.push(new Ship(shipLength));                
+            }
+            shipLength--;            
+        }
+    };
     
-    Game.prototype.createShips = function (field, array){//создание кораблей
-        var shipLength = array.length;
-        var ships = [];
-        for (var i = 0 ; i < array.length ; i++) {            
-            for (var j = 0; j < array[i]; j++ ){
-                var rcoord;                
+    GameZone.prototype.shipPlacement = function (field){//размещение кораблей на поле
+        var shipLength = this.fleet.length;
+        var id = 0;
+        for (var i = 0 ; i < this.fleet.length ; i++) {            
+            for (var j = 0; j < this.fleet[i]; j++ ){
+                var coordinate;                
                 do {
-                    rcoord = [randomInt(field.width), randomInt(field.height)];
-                } while (field.validateCoord(rcoord[0], rcoord[1]) === false)
+                    coordinate = [randomInt(field.width), randomInt(field.height)];
+                } while (field.validateCoord(coordinate[0], coordinate[1]) === false)
 
-                var coordinate = rcoord;
-
-                var rorient;
+                var orientation;
                 do {
-                    rorient = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
-                } while (field.validateOrientation(coordinate[0], coordinate[1], rorient, shipLength) === false)
-                var orientation = rorient;                
+                    orientation = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
+                } while (field.validateOrientation(coordinate[0], coordinate[1], orientation, shipLength) === false)
 
-                var body = [];
+                var sections = [];  
                 if (orientation === 0) {
                     for (var k = 0; k < shipLength; k++) {
-                        body[k]=[coordinate[0], coordinate[1] + k];
+                        sections.push(new Section(coordinate[0], coordinate[1] + k));
                     }
                 } else if (orientation === 1) {
                     for (var k = 0; k < shipLength; k++) {
-                        body[k]=[coordinate[0] + k, coordinate[1]];
+                        sections.push(new Section(coordinate[0] + k, coordinate[1]));
                     }
                 } else if (orientation === 2) {
                     for (var k = 0; k < shipLength; k++) {
-                        body[k]=[coordinate[0], coordinate[1] - k];
+                        sections.push(new Section(coordinate[0], coordinate[1] - k));
                     }
                 } else {
                     for (var k = 0; k < shipLength; k++) {
-                        body[k]=[coordinate[0] - k, coordinate[1]];
+                        sections.push(new Section(coordinate[0] - k, coordinate[1]));
                     }
                 }
 
-                ships.push(new Ship(shipLength, coordinate, orientation, body));
+                id += 1;
+                this.ships[id-1].sections = sections;
+                this.ships[id-1].id = id;                
                 field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
             }
             shipLength--;            
         }
-        console.log(ships);
+        console.log(this.ships);
         console.log(field.map);
-        return ships;
+        return this.ships;
     };
 
     Field.prototype.validateCoord = function (x, y) {
@@ -682,9 +599,26 @@
     };
 
     var field1 = new Field(10, 10);   
-    field1.createField();
-    var game1 = new Game(50);
-    var ships1 = game1.createShips(field1, fleet);    
-    field1.addReaction(ships1);
+    var game1 = new GameZone(10, 10, [1, 2, 3, 4], 50);
+    game1.createShips();
+    game1.shipPlacement(field1);
+
+    Field.prototype.showShips = function () {
+        for (var i = 0; i < this.width; i++) {
+            for (var j = 0; j < this.height; j++) {
+                if (this.map[i][j] === 1) {
+                    var x = i + 1;
+                    var y = j + 1;
+                    var row = "row-" + x;
+                    var col = "col-" + y;
+                    var selector = "." + row + " " + "." + col;
+                    var elem = document.querySelector(selector);
+                    elem.classList.add("ship");
+                }
+            }
+        }
+    };
+
+    field1.showShips();
     
 }(window));
