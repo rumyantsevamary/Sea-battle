@@ -175,7 +175,7 @@
 
     Field.prototype.generateField = function() { //визуальное создание поля
         var elem = document.getElementById('field');
-        for (var i = 1; i <= this.height ; i++) {
+        for (var i = this.height; i > 0; i--) {
             var newRow = document.createElement('div');
             var rowClass = 'row-' + i;
             newRow.classList.add(rowClass);                        
@@ -248,7 +248,7 @@
                 id += 1;
                 this.ships[id-1].sections = sections;
                 this.ships[id-1].id = id;                
-                field.fillMap(coordinate[0], coordinate[1], shipLength, orientation);                      
+                field.fillMap(coordinate[0], coordinate[1], shipLength, orientation, id);                      
             }
             shipLength--;            
         }
@@ -258,83 +258,21 @@
     };
 
     Field.prototype.validateCoord = function (x, y) {
-       if (x === 0 && y > 0 && y < 9) {
-           if (this.map[x][y] === 0 &&
-               this.map[x][y+1] === 0 &&
-               this.map[x][y-1] === 0 &&
-               this.map[x+1][y] === 0 &&
-               this.map[x+1][y+1] === 0 && 
-               this.map[x+1][y-1] === 0) {
-                   return true;
-               } return false;
-       } else if (x === 9 && y > 0 && y < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x-1][y] === 0 && 
-            this.map[x-1][y-1] === 0 && 
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (y === 0 && x > 0 && x < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x-1][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x+1][y+1] === 0 &&
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (y === 9 && x > 0 && x < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x+1][y] === 0 && 
-            this.map[x][y-1] === 0 && 
-            this.map[x-1][y] === 0 &&
-            this.map[x+1][y-1] === 0 && 
-            this.map[x-1][y-1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 0 && y === 0) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x+1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 0 && y === 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x+1][y-1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 9 && y === 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x-1][y-1] === 0 &&
-            this.map[x-1][y] === 0) {
-                return true;
-            } return false;
-       } else if (x === 9 && y === 0) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x-1][y+1] === 0 &&
-            this.map[x-1][y] === 0) {
-                return true;
-            } return false;
-       } else {
-           if (this.map[x][y] === 0 && 
-            this.map[x][y+1] === 0 && 
-            this.map[x+1][y] === 0 && 
-            this.map[x][y-1] === 0 && 
-            this.map[x-1][y] === 0 && 
-            this.map[x+1][y+1] === 0 && 
-            this.map[x+1][y-1] === 0 && 
-            this.map[x-1][y-1] === 0 && 
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false; 
-       }              
+        var n = 0;
+        for (var i = 0; i < 3; i++){
+            for (var j = 0; j < 3; j++){
+                if (x - 1 + i < this.width && x - 1 + i >= 0 && y - 1 + j < this.height && y - 1 + j >= 0) {
+                    if (this.map[x - 1 + i][y - 1 + j] === 0) {
+                            n += 1;
+                    }                                                   
+                } else {
+                    n += 1;
+                }
+            }
+        }
+        if (n === 9) {
+            return true;
+        } return false;
     };
 
     Field.prototype.validateOrientation = function (x, y, orientation, length) {
@@ -529,26 +467,26 @@
         }
     };
 
-    Field.prototype.fillMap = function (x, y, length, orientation) {
+    Field.prototype.fillMap = function (x, y, length, orientation, id) {
         if (orientation === 0) {
                 for (var j = y; j < y + length; j++) {//up
                     var i = x;
-                    this.map[i][j] = 1;
+                    this.map[i][j] = id;
                 };
         }  else if (orientation === 1)  {//right
                 for (var i = x; i < x + length; i++) {//right
                     var j = y;
-                    this.map[i][j] = 1;
+                    this.map[i][j] = id;
                 };
         }  else if (orientation === 2)  {//down
                 for (var j = y; j > y - length; j--) {//down
                     var i = x;
-                    this.map[i][j] = 1;
+                    this.map[i][j] = id;
                 };
         } else {
                 for (var i = x; i > x - length; i--) {//left
                     var j = y;
-                    this.map[i][j] = 1;
+                    this.map[i][j] = id;
                };
         };
     };
@@ -606,9 +544,9 @@
     Field.prototype.showShips = function () {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
-                if (this.map[i][j] === 1) {
-                    var x = i + 1;
-                    var y = j + 1;
+                if (this.map[i][j] != 0) {
+                    var y = i + 1;
+                    var x = j + 1;
                     var row = "row-" + x;
                     var col = "col-" + y;
                     var selector = "." + row + " " + "." + col;

@@ -309,3 +309,102 @@ Field.prototype.fillMap = function (x, y, length, orientation) {
                     }
                 }
             }
+
+            Field.prototype.validateCoord = function (x, y) {
+                var n = 0;
+                for (var i = 0; i < 3; i++){
+                    for (var j = 0; j < 3; j++){
+                        if (x - 1 + i < this.width && x - 1 + i >= 0 && y - 1 + j < this.height && y - 1 + j >= 0) {
+                                if (this.map[x - 1 + i][y - 1 + j] === 0) {
+                                    n += 1;
+                                }                                                   
+                        } else {
+                            n += 1;
+                        }
+                    }
+                }
+                console.log(n);
+                if (n === 9) {
+                    return true;
+                } return false;
+            };
+
+            Field.prototype.validateCoord = function (x, y) {
+       if (x === 0 && y > 0 && y < 9) {
+           if (this.map[x][y] === 0 &&
+               this.map[x][y+1] === 0 &&
+               this.map[x][y-1] === 0 &&
+               this.map[x+1][y] === 0 &&
+               this.map[x+1][y+1] === 0 && 
+               this.map[x+1][y-1] === 0) {
+                   return true;
+               } return false;
+       } else if (x === 9 && y > 0 && y < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x-1][y] === 0 && 
+            this.map[x-1][y-1] === 0 && 
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (y === 0 && x > 0 && x < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x-1][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x+1][y+1] === 0 &&
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (y === 9 && x > 0 && x < 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x+1][y] === 0 && 
+            this.map[x][y-1] === 0 && 
+            this.map[x-1][y] === 0 &&
+            this.map[x+1][y-1] === 0 && 
+            this.map[x-1][y-1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 0 && y === 0) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x+1][y+1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 0 && y === 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x+1][y] === 0 &&
+            this.map[x+1][y-1] === 0) {
+                return true;
+            } return false;
+       } else if (x === 9 && y === 9) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y-1] === 0 &&
+            this.map[x-1][y-1] === 0 &&
+            this.map[x-1][y] === 0) {
+                return true;
+            } return false;
+       } else if (x === 9 && y === 0) {
+           if (this.map[x][y] === 0 &&
+            this.map[x][y+1] === 0 &&
+            this.map[x-1][y+1] === 0 &&
+            this.map[x-1][y] === 0) {
+                return true;
+            } return false;
+       } else {
+           if (this.map[x][y] === 0 && 
+            this.map[x][y+1] === 0 && 
+            this.map[x+1][y] === 0 && 
+            this.map[x][y-1] === 0 && 
+            this.map[x-1][y] === 0 && 
+            this.map[x+1][y+1] === 0 && 
+            this.map[x+1][y-1] === 0 && 
+            this.map[x-1][y-1] === 0 && 
+            this.map[x-1][y+1] === 0) {
+                return true;
+            } return false; 
+       }              
+    };
