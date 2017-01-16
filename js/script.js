@@ -273,19 +273,33 @@
             var y = ship.sections[k].y;
             for (var i = 0; i < 3; i++){
                 for (var j = 0; j < 3; j++){
-                    if (this.map[x - 1 + i][y - 1 + j] === -1) {
-                       var selector = "#" + this.containerID + " div[i=\"" + (x - 1 + i) + "\"][j=\"" + (y - 1 + j) + "\"]";
-                       var elem = document.querySelector(selector);
-                        elem.classList.add("none");
+                    if (x - 1 + i < this.width && x - 1 + i >= 0 && y - 1 + j < this.height && y - 1 + j >= 0) {                    
+                        if (this.map[x - 1 + i][y - 1 + j] === -1) {
+                        var selector = "#" + this.containerID + " div[i=\"" + (x - 1 + i) + "\"][j=\"" + (y - 1 + j) + "\"]";
+                        var elem = document.querySelector(selector);
+                            elem.classList.add("none");
+                        }
                     }           
                 }
             }
         }
     };
 
-    GameZone.prototype.checkPlayerStatus
+    GameZone.prototype.checkPlayerStatus = function (opponent) {        
+        if (opponent.player.health === 0) {
+            return false;
+        } else {
+            return true;
+        }
+    };
 
-    GameZone.prototype.init = function () {
+    GameZone.prototype.changePlayer = function (opponent){
+        this.status = false;
+        opponent.status = true;
+    };
+
+    GameZone.prototype.init = function (opponent) {
+         var opponent = opponent;
          var that = this;
          var parent = document.getElementById(this.containerID);
          parent.addEventListener('click', function(event){
@@ -305,18 +319,19 @@
                  }
                  event.target.classList.add("ship");
                  console.log(currentShip);
-                 if (!currentShip.checkStatus()) {
+                 if (!currentShip.checkStatus()) {                     
+                     opponent.player.health -= 1;
                      that.showSectionsAround(currentShip);
-                     //that.checkPlayerStatus();
-                 } 
+                     if (!that.checkPlayerStatus(opponent)) {
+                         alert(that.player.name + ' win!');
+                     }
+                 }                  
              } else {
                  event.target.classList.add("none");
-             }
-             //to-do: встроить проверку окончания игры (проверка жизни играков)
-             
-             //to-do: проверяем: если клетка = -1 то ход переходит другому игроку 
-             //название игрока меняется в поле player над картой
-         })//если попали в корабль, остается тот же игрок
+                 that.changePlayer(opponent);
+             }             
+             //to-do:название игрока меняется в поле player над картой
+         })
     };
 
     
@@ -333,10 +348,6 @@
         }
     };
 
-    
-
-    
-
     var fleet = [1, 2, 3, 4];
     var player1 = new Player('Jack');
     var game1 = new GameZone(10, 10, fleet, player1, true, 'gameField1');    
@@ -344,7 +355,7 @@
     game1.createShips();
     game1.shipPlacement();
     game1.render();
-    game1.init();
+    
 
     var player2 = new Player('Jess');
     var game2 = new GameZone(10, 10, fleet, player2, false, 'gameField2');
@@ -352,9 +363,10 @@
     game2.initMap();
     game2.shipPlacement();  
     game2.render();
-    game2.init();
+    
 
-    console.log(game1, game2);
+    game1.init(game2);
+    game2.init(game1);
 
     
     
