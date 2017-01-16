@@ -68,375 +68,184 @@
 
     
 
-    Field.prototype.showShips = function (field) {
-        for (var i = 0; i < field.width; i++) {
-            for (var j = 0; j < field1.height; j++) {
-                if (field.map[i][j] === 1) {
-                    var x = i + 1;
-                    var y = j + 1;
-                    var row = "row-" + x;
-                    var col = "col-" + y;
-                    var selector = "." + row + " " + "." + col;
-                    var elem = document.querySelector(selector);
-                    elem.classList.add("ship");
-                }
+    Field.prototype.generateField = function() { //визуальное создание поля
+        var elem = document.getElementById('field');
+        for (var i = this.height; i > 0; i--) {
+            var newRow = document.createElement('div');
+            var rowClass = 'row-' + i;
+            newRow.classList.add(rowClass);                        
+            for (var j = 1; j <= this.width; j ++) {
+                var newCol = document.createElement('div');
+                var colClass = 'col-'+ j;
+                newCol.classList.add(colClass);
+                newRow.appendChild(newCol);
+            }
+            elem.appendChild(newRow);
+        }
+        
+    };
+
+    Field.prototype.addReaction = function (ships) {  
+        var ships = ships;      
+        for (var i = 0; i < this.width; i++){
+            for (var j = 0; j < this.height; j++) {
+                var x = i + 1;
+                var y = j + 1;
+                var row = "row-" + x;
+                var col = "col-" + y;
+                var selector = "." + row + " " + "." + col;
+                var elem = document.querySelector(selector);
+                if (this.map[i][j] != 0) {
+                    elem.addEventListener('click', attackShip);
+                } else {
+                    elem.addEventListener('click', attackNone);
+                } 
+
+                function attackShip() {                     
+                    var colClass = this.classList[0];
+                    var rowClass = this.parentNode.classList[0];
+                    var j = parseInt(rowClass.substr(4)) - 1;
+                    var i = parseInt(colClass.substr(4)) - 1;  
+                    for (var l = 0; l < ships.length; l++) {
+                        for (var k = 0; k < ships[l].body.length; k++) {
+                            if (ships[l].body[k][0] === j && ships[l].body[k][1] === i) {
+                                ships[l].health -= 1;
+                                var ship = ships[l];  
+                                console.log(ship);
+                                if (ship.health === 0) {                                    
+                                     ship.showAround();                                    
+                                }                                 
+                            }
+                        }   
+                    }
+                   this.classList.add('attackedShip');                   
+                };
+
+                function attackNone() {
+                    this.classList.add('attackedNone');
+                };
             }
         }
     };
 
-    
-            Field.prototype.validateCoord = function (x, y) {//new version
-                var n = 0;
-                for (var i = 0; i < 3; i++){
-                    for (var j = 0; j < 3; j++){
-                        if (x - 1 + i < this.width && x - 1 + i >= 0 && y - 1 + j < this.height && y - 1 + j >= 0) {
-                                if (this.map[x - 1 + i][y - 1 + j] === 0) {
-                                    n += 1;
-                                }                                                   
-                        } else {
-                            n += 1;
+    Ship.prototype.showAround = function () { //корабль убит, показать клетки вокруг него
+        var y = this.coordinate[0] + 1;
+        var x = this.coordinate[1] + 1;
+        var orient = this.orientation;
+        var shipLength = this.type;
+        console.log(x, y, orient, shipLength);
+        if (orient === 0) {
+            for (var i = 0; i < 3; i ++){
+                var row = y - 1 + i;
+                if (row === y){
+                    var col1 = x - 1;
+                    var col2 = x + shipLength;
+                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
+                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var col = x - 1 + j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
                         }
                     }
                 }
-                console.log(n);
-                if (n === 9) {
-                    return true;
-                } return false;
-            };
-
-            Field.prototype.validateCoord = function (x, y) {//old version
-       if (x === 0 && y > 0 && y < 9) {
-           if (this.map[x][y] === 0 &&
-               this.map[x][y+1] === 0 &&
-               this.map[x][y-1] === 0 &&
-               this.map[x+1][y] === 0 &&
-               this.map[x+1][y+1] === 0 && 
-               this.map[x+1][y-1] === 0) {
-                   return true;
-               } return false;
-       } else if (x === 9 && y > 0 && y < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x-1][y] === 0 && 
-            this.map[x-1][y-1] === 0 && 
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (y === 0 && x > 0 && x < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x-1][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x+1][y+1] === 0 &&
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (y === 9 && x > 0 && x < 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x+1][y] === 0 && 
-            this.map[x][y-1] === 0 && 
-            this.map[x-1][y] === 0 &&
-            this.map[x+1][y-1] === 0 && 
-            this.map[x-1][y-1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 0 && y === 0) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x+1][y+1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 0 && y === 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x+1][y] === 0 &&
-            this.map[x+1][y-1] === 0) {
-                return true;
-            } return false;
-       } else if (x === 9 && y === 9) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y-1] === 0 &&
-            this.map[x-1][y-1] === 0 &&
-            this.map[x-1][y] === 0) {
-                return true;
-            } return false;
-       } else if (x === 9 && y === 0) {
-           if (this.map[x][y] === 0 &&
-            this.map[x][y+1] === 0 &&
-            this.map[x-1][y+1] === 0 &&
-            this.map[x-1][y] === 0) {
-                return true;
-            } return false;
-       } else {
-           if (this.map[x][y] === 0 && 
-            this.map[x][y+1] === 0 && 
-            this.map[x+1][y] === 0 && 
-            this.map[x][y-1] === 0 && 
-            this.map[x-1][y] === 0 && 
-            this.map[x+1][y+1] === 0 && 
-            this.map[x+1][y-1] === 0 && 
-            this.map[x-1][y-1] === 0 && 
-            this.map[x-1][y+1] === 0) {
-                return true;
-            } return false; 
-       }              
-    };
-
-    Field.prototype.validateOrientation = function (x, y, orientation, length) //old version
-        if (orientation === 0) {//up
-            var k = 1;
-            if (y === this.height - length) {
-                for (var i = 1; i < length-1; i++) {
-                    if (x === 0) {
-                        if (this.map[x][y+i+1] === 0 &&
-                            this.map[x+1][y+i+1] === 0) {
-                                k += 1;
-                            }
-                    } else if (x === 9) {
-                        if ( this.map[x][y+i+1] === 0 &&
-                            this.map[x-1][y+i+1] === 0) {
-                                k += 1;  
-                            }
-                    } else {
-                        if (this.map[x][y+i+1] === 0 &&
-                            this.map[x+1][y+i+1] === 0 &&
-                            this.map[x-1][y+i+1] === 0) {
-                                k += 1;
-                            }
-                    }
-                };
-            } else if (y < this.height - length) {
-                for (var i = 1; i < length; i++) {
-                    if (x === 0) {
-                        if ( this.map[x][y+i+1] === 0 &&
-                            this.map[x+1][y+i+1] === 0) {
-                                k += 1;
-                            }
-                    } else if (x === 9) {
-                        if (this.map[x][y+i+1] === 0 &&
-                            this.map[x-1][y+i+1] === 0) {
-                                k += 1;
+            }            
+        } else if (orient === 2) {
+            for (var i = 0; i < 3; i ++){
+                var row = y - 1 + i;
+                if (row === y){
+                    var col1 = x + 1;
+                    var col2 = x - shipLength;
+                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
+                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
                         }
-                    } else {
-                        if (this.map[x][y+i+1] === 0 &&
-                            this.map[x+1][y+i+1] === 0 &&
-                            this.map[x-1][y+i+1] === 0) {
-                                k += 1;
-                            }
-                    }        
-                };
-            };
-            if (k === length) {
-                return true;
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var col = x + 1 - j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
             }
-            return false;
-        } else if (orientation === 1) {//right
-            var k = 1;
-            if (x === this.width - length) {
-                for (var i = 1; i < length-1; i++) {
-                        if (y === 0) {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+i+1][y+1] === 0) {
-                                     k += 1;
-                                }
-                        } else if (y === 9) {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+i+1][y-1] === 0) {
-                                    k += 1;
-                                }
-                        } else {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+1+i][y+1] === 0 &&
-                                this.map[x+1+i][y-1] === 0) {
-                                    k += 1;
-                                }
-                        }           
-                    };
-            } else if (x < this.width - length) {
-                for (var i = 1; i < length; i++) {
-                        if (y === 0) {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+i+1][y+1] === 0) {
-                                     k += 1;
-                                }
-                        } else if (y === 9) {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+i+1][y-1] === 0) {
-                                    k += 1;
-                                }
-                        } else {
-                            if (this.map[x+i+1][y] === 0 &&
-                                this.map[x+1+i][y+1] === 0 &&
-                                this.map[x+1+i][y-1] === 0) {
-                                    k += 1;
-                                }
-                        }           
-                    };
-            };
-            if (k === length) {
-                return true;
+        } else if (orient === 1) {
+            for (var i = 0; i < 3; i ++){
+                var col = x - 1 + i;
+                if (col === x){
+                    var row1 = y - 1;
+                    var row2 = y + shipLength;
+                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
+                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var row = y - 1 + j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
             }
-            return false;                
-        } else if (orientation === 2) {//down
-            var k = 1;
-            if (y === length - 1) {
-                for (var i = 1; i < length-1; i++) {
-                    if (x === 0) {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x+1][y-i-1] === 0) {
-                                k += 1;
-                            }
-                    } else if (x === 9) {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x-1][y-i-1] === 0) {
-                               k += 1; 
-                            }
-                    } else {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x+1][y-i-1] === 0 &&
-                            this.map[x-1][y-i-1] === 0) {
-                                k += 1;
-                            }
-                    }   
-                };
-            } else if (y > length - 1) {
-                for (var i = 1; i < length; i++) {
-                    if (x === 0) {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x+1][y-i-1] === 0) {
-                                k += 1;
-                            }
-                    } else if (x === 9) {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x-1][y-i-1] === 0) {
-                               k += 1; 
-                            }
-                    } else {
-                        if (this.map[x][y-i-1] === 0 &&
-                            this.map[x+1][y-i-1] === 0 &&
-                            this.map[x-1][y-i-1] === 0) {
-                                k += 1;
-                            }
-                    }            
-                };
-            };
-            if (k === length) {
-                return true;
+        } else if (orient === 3) {
+            for (var i = 0; i < 3; i ++){
+                var col = x - 1 + i;
+                if (col === x){
+                    var row1 = y + 1;
+                    var row2 = y - shipLength;
+                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
+                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
+                    if (document.querySelector(selector1)) {
+                            var elem = document.querySelector(selector1);
+                            elem.classList.add('attackedNone');
+                        }
+                    if (document.querySelector(selector2)) {
+                            var elem = document.querySelector(selector2);
+                            elem.classList.add('attackedNone');
+                        }
+
+                } else {
+                    for (var j = 0; j <= shipLength + 1; j ++) {
+                        var row = y + 1 - j;
+                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
+                        if (document.querySelector(selector)) {
+                            var elem = document.querySelector(selector);
+                            elem.classList.add('attackedNone');
+                        }
+                    }
+                }
             }
-            return false;
-        } else if (orientation === 3) {//left
-            var k = 1;
-            if (x === length - 1) {
-                for (var i = 1; i < length-1; i++) {
-                        if (y === 0) {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-i-1][y+1] === 0) {
-                                    k += 1;
-                                }
-                        } else if (y === 9) {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-i-1][y-1] === 0) {
-                                    k += 1;
-                                }
-                        } else {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-1-i][y+1] === 0 &&
-                                this.map[x-1-i][y-1] === 0) {
-                                    k += 1;
-                                }
-                        }          
-                    };
-            } else if (x > length - 1) {
-                for (var i = 1; i < length; i++) {
-                        if (y === 0) {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-i-1][y+1] === 0) {
-                                    k += 1;
-                                }
-                        } else if (y === 9) {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-i-1][y-1] === 0) {
-                                    k += 1;
-                                }
-                        } else {
-                            if (this.map[x-i-1][y] === 0 &&
-                                this.map[x-1-i][y+1] === 0 &&
-                                this.map[x-1-i][y-1] === 0) {
-                                    k += 1;
-                                }
-                        }            
-                    };
-            };
-            if (k === length) {
-                return true;
-            }
-            return false;
         }
-    };
-
-    Field.prototype.validateOrientation = function (x, y, orientation, length) {//new version
-        if (length === 1) {
-            return true;
-        } else {
-            if (orientation === 0) {//вверх
-                var n = 0;
-                for (var i = 0; i < 3; i++){
-                    for (var j = 0; j < length - 1; j++){
-                        if (x - 1 + i >= 0 && x - 1 + i < this.width && y + 2 + j >=0 && y + 2 + j < this.height) {
-                            if (this.map[x - 1 + i][y + 2 + j]) {
-                                n += 1;
-                            }
-                        } else {
-                            n += 1;
-                        }
-                    }
-                }
-            } else if (orientation === 1) {//вправо
-                var n = 0;
-                for (var i = 0; i < length - 1; i++){
-                    for (var j = 0; j < 3; j++){
-                        if (x + 2 + i >= 0 && x + 2 + i < this.width && y - 1 + j >=0 && y - 1 + j < this.height) {
-                            if (this.map[x + 2 + i][y - 1 + j]) {
-                                n += 1;
-                            }
-                        } else {
-                            n += 1;
-                        }
-                    }
-                }
-            } else if (orientation === 2) {//вниз
-                var n = 0;
-                for (var i = 0; i < 3; i++){
-                    for (var j = 0; j < length - 1; j++){
-                        if (x - 1 + i >= 0 && x - 1 + i < this.width && y - 2 - j >=0 && y - 2 - j < this.height) {
-                            if (this.map[x - 1 + i][y - 2 - j]) {
-                                n += 1;
-                            }
-                        } else {
-                            n += 1;
-                        }
-                    }
-                }
-            } else {//влево
-                var n = 0;
-                for (var i = 0; i < length - 1; i++){
-                    for (var j = 0; j < 3; j++){
-                        if (x - 2 - i >= 0 && x - 2 - i < this.width && y - 1 + j >=0 && y - 1 + j < this.height) {
-                            if (this.map[x - 2 - i][y - 1 + j]) {
-                                n += 1;
-                            }
-                        } else {
-                            n += 1;
-                        }
-                    }
-                }
-            }
-            if (n === ((length - 1) * 3)) {
-                return true;
-            } else {
-                return false;
-            }
-       }
+       
     };

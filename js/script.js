@@ -22,183 +22,58 @@
         this.id = id;
     
     }
-
-    Ship.prototype.checkStatus = function () { //проверка здоровья
-
-    };
-
-    Ship.prototype.showAround = function () { //корабль убит, показать клетки вокруг него
-        var y = this.coordinate[0] + 1;
-        var x = this.coordinate[1] + 1;
-        var orient = this.orientation;
-        var shipLength = this.type;
-        console.log(x, y, orient, shipLength);
-        if (orient === 0) {
-            for (var i = 0; i < 3; i ++){
-                var row = y - 1 + i;
-                if (row === y){
-                    var col1 = x - 1;
-                    var col2 = x + shipLength;
-                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
-                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
-                    if (document.querySelector(selector1)) {
-                            var elem = document.querySelector(selector1);
-                            elem.classList.add('attackedNone');
-                        }
-                    if (document.querySelector(selector2)) {
-                            var elem = document.querySelector(selector2);
-                            elem.classList.add('attackedNone');
-                        }
-
-                } else {
-                    for (var j = 0; j <= shipLength + 1; j ++) {
-                        var col = x - 1 + j;
-                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
-                        if (document.querySelector(selector)) {
-                            var elem = document.querySelector(selector);
-                            elem.classList.add('attackedNone');
-                        }
-                    }
-                }
-            }            
-        } else if (orient === 2) {
-            for (var i = 0; i < 3; i ++){
-                var row = y - 1 + i;
-                if (row === y){
-                    var col1 = x + 1;
-                    var col2 = x - shipLength;
-                    var selector1 = "." + "row-" + row + " " + "." + "col-" + col1;
-                    var selector2 = "." + "row-" + row + " " + "." + "col-" + col2;
-                    if (document.querySelector(selector1)) {
-                            var elem = document.querySelector(selector1);
-                            elem.classList.add('attackedNone');
-                        }
-                    if (document.querySelector(selector2)) {
-                            var elem = document.querySelector(selector2);
-                            elem.classList.add('attackedNone');
-                        }
-
-                } else {
-                    for (var j = 0; j <= shipLength + 1; j ++) {
-                        var col = x + 1 - j;
-                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
-                        if (document.querySelector(selector)) {
-                            var elem = document.querySelector(selector);
-                            elem.classList.add('attackedNone');
-                        }
-                    }
-                }
-            }
-        } else if (orient === 1) {
-            for (var i = 0; i < 3; i ++){
-                var col = x - 1 + i;
-                if (col === x){
-                    var row1 = y - 1;
-                    var row2 = y + shipLength;
-                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
-                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
-                    if (document.querySelector(selector1)) {
-                            var elem = document.querySelector(selector1);
-                            elem.classList.add('attackedNone');
-                        }
-                    if (document.querySelector(selector2)) {
-                            var elem = document.querySelector(selector2);
-                            elem.classList.add('attackedNone');
-                        }
-
-                } else {
-                    for (var j = 0; j <= shipLength + 1; j ++) {
-                        var row = y - 1 + j;
-                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
-                        if (document.querySelector(selector)) {
-                            var elem = document.querySelector(selector);
-                            elem.classList.add('attackedNone');
-                        }
-                    }
-                }
-            }
-        } else if (orient === 3) {
-            for (var i = 0; i < 3; i ++){
-                var col = x - 1 + i;
-                if (col === x){
-                    var row1 = y + 1;
-                    var row2 = y - shipLength;
-                    var selector1 = "." + "row-" + row1 + " " + "." + "col-" + col;
-                    var selector2 = "." + "row-" + row2 + " " + "." + "col-" + col;
-                    if (document.querySelector(selector1)) {
-                            var elem = document.querySelector(selector1);
-                            elem.classList.add('attackedNone');
-                        }
-                    if (document.querySelector(selector2)) {
-                            var elem = document.querySelector(selector2);
-                            elem.classList.add('attackedNone');
-                        }
-
-                } else {
-                    for (var j = 0; j <= shipLength + 1; j ++) {
-                        var row = y + 1 - j;
-                        var selector = "." + "row-" + row + " " + "." + "col-" + col;
-                        if (document.querySelector(selector)) {
-                            var elem = document.querySelector(selector);
-                            elem.classList.add('attackedNone');
-                        }
-                    }
-                }
-            }
-        }
-       
-    };
-
+    
     function Player(name) {
-        this.ships = [];
-        this.name = name;        
-    }
+        this.name = name;
+        this.shots = 0;        
+    }   
 
-   
-
-    function Field(width, height) {// конструктор поля
+    function GameZone(width, height, fleet, player, status, containerID) {
         this.width = width;
         this.height = height;
+        this.ships = [];
+        this.player = player;
+        this.status = status;
+        this.containerID = containerID;
+        this.fleet = fleet;//var fleet = [1, 2, 3, 4]; //количество краблей различного типа
         this.map = [];
-        this.generateField();
-        this.createMap();
     }
 
-    Field.prototype.createMap = function () {//создание карты поля
-        for (var i = 0; i < this.width; i++) {
-            this.map[i] = [];
-            for (var j=0; j < this.height; j++) {
-                this.map[i][j] = 0;
-            }
-        }        
+    GameZone.prototype.setStatus = function (values) {
+        this.status = values;
     };
 
-    Field.prototype.generateField = function() { //визуальное создание поля
-        var elem = document.getElementById('field');
-        for (var i = this.height; i > 0; i--) {
-            var newRow = document.createElement('div');
-            var rowClass = 'row-' + i;
-            newRow.classList.add(rowClass);                        
-            for (var j = 1; j <= this.width; j ++) {
-                var newCol = document.createElement('div');
-                var colClass = 'col-'+ j;
-                newCol.classList.add(colClass);
-                newRow.appendChild(newCol);
+    GameZone.prototype.getStatus = function () {
+        return this.status;
+    };
+
+    GameZone.prototype.initMap = function () {
+        for (var i = 0; i < this.width; i++) {
+            this.map[i] = [];
+            for (var j = 0; j < this.height; j++) {
+                this.map[i][j] = -1;
             }
-            elem.appendChild(newRow);
+        }
+    };
+
+    GameZone.prototype.render = function () {//создание поля
+        var parent = document.getElementById(this.containerID);
+        for (var i = 0; i < this.width; i++) {
+            for (var j = 0; j < this.height; j++) {
+                var elem = this.createDOMelement('div', {'i' : i, 'j' : j, id : this.map[i][j], class : 'field'});
+                parent.appendChild(elem);
+            }
         }
         
     };
 
-    function GameZone(width, height, fleet, shots) {
-        this.shots = shots;
-        this.width = width;
-        this.height = height;
-        this.ships = [];
-        this.player1 = null;
-        this.player2 = null;
-        this.fleet = fleet;//var fleet = [1, 2, 3, 4]; //количество краблей различного типа
-    }
+    GameZone.prototype.createDOMelement = function (tag, attr) {
+        var elem = document.createElement(tag);
+        for (var key in attr) {
+            elem.setAttribute(key, attr[key]);
+        }
+        return elem;
+    };
         
 
     GameZone.prototype.createShips = function () {//создание флота
@@ -211,21 +86,21 @@
         }
     };
     
-    GameZone.prototype.shipPlacement = function (field){//размещение кораблей на поле
+    GameZone.prototype.shipPlacement = function (){//размещение кораблей на поле
         var shipLength = this.fleet.length;
         var id = 0;
         for (var i = 0 ; i < this.fleet.length ; i++) {            
             for (var j = 0; j < this.fleet[i]; j++ ){
                 var coordinate;                
                 do {
-                    coordinate = [randomInt(field.width), randomInt(field.height)];
-                } while (field.validateCoord(coordinate[0], coordinate[1]) === false)
+                    coordinate = [randomInt(this.width), randomInt(this.height)];
+                } while (this.validateCoord(coordinate[0], coordinate[1]) === false)
 
                 var orientation;
                 do {
                     orientation = randomInt(4);//0 - вверх, 1 - вправо, 2 - вниз, 3 - влево  
-                } while (field.validateOrientation(coordinate[0], coordinate[1], orientation, shipLength) === false)
-
+                } while (this.validateOrientation(coordinate[0], coordinate[1], orientation, shipLength) === false)
+                
                 var sections = [];  
                 if (orientation === 0) {
                     for (var k = 0; k < shipLength; k++) {
@@ -244,25 +119,25 @@
                         sections.push(new Section(coordinate[0] - k, coordinate[1]));
                     }
                 }
-
-                id += 1;
-                this.ships[id-1].sections = sections;
-                this.ships[id-1].id = id;                
-                field.fillMap(coordinate[0], coordinate[1], shipLength, orientation, id);                      
+                
+                this.ships[id].sections = sections;
+                this.ships[id].id = id;                
+                this.fillMap(coordinate[0], coordinate[1], shipLength, orientation, id); 
+                id += 1;                     
             }
             shipLength--;            
         }
         console.log(this.ships);
-        console.log(field.map);
+        console.log(this.map);
         return this.ships;
     };
 
-    Field.prototype.validateCoord = function (x, y) {//проверка первой координаты
+    GameZone.prototype.validateCoord = function (x, y) {//проверка первой координаты
         var n = 0;
         for (var i = 0; i < 3; i++){
             for (var j = 0; j < 3; j++){
                 if (x - 1 + i < this.width && x - 1 + i >= 0 && y - 1 + j < this.height && y - 1 + j >= 0) {
-                    if (this.map[x - 1 + i][y - 1 + j] === 0) {
+                    if (this.map[x - 1 + i][y - 1 + j] === -1) {
                             n += 1;
                     }                                                   
                 } else {
@@ -275,7 +150,7 @@
         } return false;
     };
 
-    Field.prototype.validateOrientation = function (x, y, orientation, length) { // проверка ориентации в пространстве
+    GameZone.prototype.validateOrientation = function (x, y, orientation, length) { // проверка ориентации в пространстве
         if (length === 1) {
             return true;
         } else {
@@ -287,7 +162,7 @@
                     for (var i = 0; i < 3; i++){
                         for (var j = 0; j < length - 1; j++){
                             if (x - 1 + i >= 0 && x - 1 + i < this.width && y + 2 + j >=0 && y + 2 + j < this.height) {
-                                if (this.map[x - 1 + i][y + 2 + j] === 0) {
+                                if (this.map[x - 1 + i][y + 2 + j] === -1) {
                                     n += 1;
                                 }
                             } else {
@@ -304,7 +179,7 @@
                     for (var i = 0; i < length - 1; i++){
                         for (var j = 0; j < 3; j++){
                             if (x + 2 + i >= 0 && x + 2 + i < this.width && y - 1 + j >=0 && y - 1 + j < this.height) {
-                                if (this.map[x + 2 + i][y - 1 + j] === 0) {
+                                if (this.map[x + 2 + i][y - 1 + j] === -1) {
                                     n += 1;
                                 }
                             } else {
@@ -321,7 +196,7 @@
                     for (var i = 0; i < 3; i++){
                         for (var j = 0; j < length - 1; j++){
                             if (x - 1 + i >= 0 && x - 1 + i < this.width && y - 2 - j >=0 && y - 2 - j < this.height) {
-                                if (this.map[x - 1 + i][y - 2 - j] === 0) {
+                                if (this.map[x - 1 + i][y - 2 - j] === -1) {
                                     n += 1;
                                 }
                             } else {
@@ -338,7 +213,7 @@
                     for (var i = 0; i < length - 1; i++){
                         for (var j = 0; j < 3; j++){
                             if (x - 2 - i >= 0 && x - 2 - i < this.width && y - 1 + j >=0 && y - 1 + j < this.height) {
-                                if (this.map[x - 2 - i][y - 1 + j] === 0) {
+                                if (this.map[x - 2 - i][y - 1 + j] === -1) {
                                     n += 1;
                                 }
                             } else {
@@ -356,7 +231,7 @@
        }
     };
 
-    Field.prototype.fillMap = function (x, y, length, orientation, id) {
+    GameZone.prototype.fillMap = function (x, y, length, orientation, id) {
         if (orientation === 0) {
                 for (var j = y; j < y + length; j++) {//up
                     var i = x;
@@ -380,65 +255,11 @@
         };
     };
 
-    
-
-    Field.prototype.addReaction = function (ships) {  
-        var ships = ships;      
-        for (var i = 0; i < this.width; i++){
-            for (var j = 0; j < this.height; j++) {
-                var x = i + 1;
-                var y = j + 1;
-                var row = "row-" + x;
-                var col = "col-" + y;
-                var selector = "." + row + " " + "." + col;
-                var elem = document.querySelector(selector);
-                if (this.map[i][j] === 1) {
-                    elem.addEventListener('click', attackShip);
-                } else {
-                    elem.addEventListener('click', attackNone);
-                } 
-
-                function attackShip() {                     
-                    var colClass = this.classList[0];
-                    var rowClass = this.parentNode.classList[0];
-                    var j = parseInt(rowClass.substr(4)) - 1;
-                    var i = parseInt(colClass.substr(4)) - 1;  
-                    for (var l = 0; l < ships.length; l++) {
-                        for (var k = 0; k < ships[l].body.length; k++) {
-                            if (ships[l].body[k][0] === j && ships[l].body[k][1] === i) {
-                                ships[l].health -= 1;
-                                var ship = ships[l];  
-                                console.log(ship);
-                                if (ship.health === 0) {                                    
-                                     ship.showAround();                                    
-                                }                                 
-                            }
-                        }   
-                    }
-                   this.classList.add('attackedShip');                   
-                };
-
-                function attackNone() {
-                    this.classList.add('attackedNone');
-                };
-            }
-        }
-    };
-
-    var field1 = new Field(10, 10);   
-    var game1 = new GameZone(10, 10, [1, 2, 3, 4], 50);
-    game1.createShips();
-    game1.shipPlacement(field1);
-
-    Field.prototype.showShips = function () {
+    GameZone.prototype.showShips = function () {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
-                if (this.map[i][j] != 0) {
-                    var y = i + 1;
-                    var x = j + 1;
-                    var row = "row-" + x;
-                    var col = "col-" + y;
-                    var selector = "." + row + " " + "." + col;
+                if (this.map[i][j] != -1) {                    
+                    var selector = "#" + this.containerID + " div[i=\"" + i + "\"][j=\"" + j + "\"]";
                     var elem = document.querySelector(selector);
                     elem.classList.add("ship");
                 }
@@ -446,6 +267,27 @@
         }
     };
 
-    field1.showShips();
+    
+
+    
+
+    var fleet = [1, 2, 3, 4];
+    var player1 = new Player('Jack');
+    var game1 = new GameZone(10, 10, fleet, player1, true, 'gameField1');    
+    game1.initMap();    
+    game1.createShips();
+    game1.shipPlacement();
+    game1.render();
+    game1.showShips();
+
+    var player2 = new Player('Jess');
+    var game2 = new GameZone(10, 10, fleet, player2, false, 'gameField2');
+    game2.createShips();
+    game2.initMap();
+    game2.shipPlacement();  
+    game2.render();
+    game2.showShips();
+
+    
     
 }(window));

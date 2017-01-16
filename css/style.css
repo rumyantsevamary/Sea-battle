@@ -1,29 +1,21 @@
-.field div[class^="col"] {
-    width: 30px;
-    height: 30px;
-    border: 1px solid darkblue;
-    background-color: lightskyblue;
-    margin: 1px;
-    padding: 0;    
+.field {
+    width: 25px;
+    height: 25px;
+    background-color: green;
+    float: left;
+    border: 1px dashed springgreen;
+    box-sizing: border-box;
+}
+
+#gameField1, #gameField2 {
+    width: 250px;
     display: inline-block;
 }
 
-.field div[class^="row"] {
-    margin-bottom: -5px ;
-    padding: 0;
-}
-.field {
-    text-align: center;
+#gameField2 {
+    float: right;
 }
 
-.field div.ship {
-    background-color: darkslateblue; 
-}
-
-.field div.attackedShip {
-    background-color: firebrick;
-}
-
-.field div.attackedNone {
-    background-color: lightblue;
+.ship {
+    background-color: orangered;
 }
