@@ -19,13 +19,21 @@
         this.sectionNumber = sectionNumber;
         this.health = sectionNumber;
         this.sections = [];
-        this.id = id;
-    
+        this.id = id;    
     }
+
+    Ship.prototype.checkStatus = function () {
+        if (this.health === 0) {
+            return false;
+        } else {
+            return true;
+        }
+    };
     
     function Player(name) {
         this.name = name;
-        this.shots = 0;        
+        this.shots = 0; 
+        this.health = 0;       
     }   
 
     function GameZone(width, height, fleet, player, status, containerID) {
@@ -84,6 +92,11 @@
             }
             shipLength--;            
         }
+        var health = 0;
+        for (var k = 0; k < this.fleet.length; k ++) {
+            health += this.fleet[k];
+        }
+        this.player.health = health;
     };
     
     GameZone.prototype.shipPlacement = function (){//размещение кораблей на поле
@@ -127,8 +140,6 @@
             }
             shipLength--;            
         }
-        console.log(this.ships);
-        console.log(this.map);
         return this.ships;
     };
 
@@ -255,6 +266,61 @@
         };
     };
 
+    GameZone.prototype.showSectionsAround = function (ship) {
+        var ship = ship;
+        for (var k = 0; k < ship.sectionNumber; k ++) {
+            var x = ship.sections[k].x;
+            var y = ship.sections[k].y;
+            for (var i = 0; i < 3; i++){
+                for (var j = 0; j < 3; j++){
+                    if (this.map[x - 1 + i][y - 1 + j] === -1) {
+                       var selector = "#" + this.containerID + " div[i=\"" + (x - 1 + i) + "\"][j=\"" + (y - 1 + j) + "\"]";
+                       var elem = document.querySelector(selector);
+                        elem.classList.add("none");
+                    }           
+                }
+            }
+        }
+    };
+
+    GameZone.prototype.checkPlayerStatus
+
+    GameZone.prototype.init = function () {
+         var that = this;
+         var parent = document.getElementById(this.containerID);
+         parent.addEventListener('click', function(event){
+             if (!that.getStatus()) return;
+             var id = event.target.getAttribute('id');
+             var i = +event.target.getAttribute('i');
+             var j = +event.target.getAttribute('j');
+             if (id != -1) {
+                  var currentShip = that.ships[id];
+                  for (var k = 0; k < currentShip.sections.length; k++) {// отлавливаем id корабля,
+                        if (currentShip.sections[k].x === i && currentShip.sections[k].y === j) {//ищем координаты конкретной секции, делаем ее false и
+                            if (currentShip.sections[k].status) { // уменьшаем жизнь корблю
+                                currentShip.sections[k].status = false;
+                                currentShip.health -= 1;                                
+                            }                   
+                        }
+                 }
+                 event.target.classList.add("ship");
+                 console.log(currentShip);
+                 if (!currentShip.checkStatus()) {
+                     that.showSectionsAround(currentShip);
+                     //that.checkPlayerStatus();
+                 } 
+             } else {
+                 event.target.classList.add("none");
+             }
+             //to-do: встроить проверку окончания игры (проверка жизни играков)
+             
+             //to-do: проверяем: если клетка = -1 то ход переходит другому игроку 
+             //название игрока меняется в поле player над картой
+         })//если попали в корабль, остается тот же игрок
+    };
+
+    
+
     GameZone.prototype.showShips = function () {
         for (var i = 0; i < this.width; i++) {
             for (var j = 0; j < this.height; j++) {
@@ -278,7 +344,7 @@
     game1.createShips();
     game1.shipPlacement();
     game1.render();
-    game1.showShips();
+    game1.init();
 
     var player2 = new Player('Jess');
     var game2 = new GameZone(10, 10, fleet, player2, false, 'gameField2');
@@ -286,7 +352,9 @@
     game2.initMap();
     game2.shipPlacement();  
     game2.render();
-    game2.showShips();
+    game2.init();
+
+    console.log(game1, game2);
 
     
     

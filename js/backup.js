@@ -249,3 +249,25 @@
         }
        
     };
+
+GameZone.prototype.showShips = function () {//показывает сгенерированные корабли на поле
+        for (var i = 0; i < this.width; i++) {
+            for (var j = 0; j < this.height; j++) {
+                if (this.map[i][j] != -1) {                    
+                    var selector = "#" + this.containerID + " div[i=\"" + i + "\"][j=\"" + j + "\"]";
+                    var elem = document.querySelector(selector);
+                    elem.classList.add("ship");
+                }
+            }
+        }
+    };
+
+GameZone.prototype.fakeSections = function () {// запись координат в sections, основываясь на fake map
+    for (var i = 0; i <this.width; i ++) {
+        for (var j = 0; j < this.height; j ++) {
+            if (this.map[i][j] != -1) {
+                this.ships[this.map[i][j]].sections.push(new Section(i, j));
+            }
+        }
+    }
+};
