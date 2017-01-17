@@ -296,6 +296,13 @@
     GameZone.prototype.changePlayer = function (opponent){
         this.status = false;
         opponent.status = true;
+        var elem = document.getElementById("player-name");
+        var player1 = elem.firstChild;
+        console.log(player1);
+        elem.removeChild(player1);        
+        var player2 = document.createTextNode(opponent.player.name);
+        console.log(player2);
+        elem.appendChild(player2);        
     };
 
     GameZone.prototype.init = function (opponent) {
